@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+.env*
+.DS_Store
+*.db
+public/uploads/*
+
+!.env.example
+!.env.docker.example
+!.env.staging.example
+!.env.production.example

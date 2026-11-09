@@ -1,0 +1,40 @@
+services:
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    command: ["--load-only", "en,id"]
+    expose:
+      - "5000"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL for the remote PostgreSQL host}
+      PORT: ${PORT:-3100}
+      HOSTNAME: "0.0.0.0"
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+      LIBRETRANSLATE_URL: ${LIBRETRANSLATE_URL:-http://libretranslate:5000}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?Set NEXT_PUBLIC_SITE_URL}
+    depends_on:
+      libretranslate:
+        condition: service_started
+    networks:
+      default: {}
+      edge:
+        aliases:
+          - ${EDGE_APP_HOSTNAME:-nursekar-staging-web}
+    volumes:
+      - staging_uploads:/app/public/uploads
+    restart: unless-stopped
+
+networks:
+  edge:
+    external: true
+    name: voxstream-edge
+volumes:
+  staging_uploads:
+    name: nursekar_staging_uploads

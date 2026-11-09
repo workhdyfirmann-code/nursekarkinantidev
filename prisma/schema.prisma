@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Post {
+  id             String   @id @default(cuid())
+  titleId        String
+  titleEn        String
+  slugId         String   @unique
+  slugEn         String   @unique
+  excerptId      String
+  excerptEn      String
+  contentId      String
+  contentEn      String
+  category       String
+  coverImage     String?
+  thumbnailImage String?
+  status         String   @default("draft")
+  publishedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Show {
+  id             String      @id @default(cuid())
+  titleId        String
+  titleEn        String
+  slugId         String      @unique
+  slugEn         String      @unique
+  descriptionId  String
+  descriptionEn  String
+  contentId      String      @default("")
+  contentEn      String      @default("")
+  coverImage     String?
+  posterImage    String?
+  venue           String
+  eventDate      DateTime
+  durationMinutes Int?
+  status         String      @default("upcoming")
+  capacity       Int?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  media          ShowMedia[]
+  sponsors       Sponsor[]
+}
+
+model ShowMedia {
+  id        String   @id @default(cuid())
+  showId   String
+  url       String
+  type      String   @default("image")
+  altId     String
+  altEn     String
+  sortOrder Int      @default(0)
+  show      Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+}
+
+model Sponsor {
+  id        String   @id @default(cuid())
+  name      String
+  logoImage String
+  tier      String
+  status    String   @default("draft")
+  isGeneral Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shows     Show[]
+}
+
+model CourseInquiry {
+  id            String   @id @default(cuid())
+  name          String
+  contact       String
+  danceType     String
+  schedule      String
+  status        String   @default("new")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PartnershipInquiry {
+  id             String   @id @default(cuid())
+  name           String
+  organization   String
+  partnershipType String
+  message        String
+  status         String   @default("new")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
